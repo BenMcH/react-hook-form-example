@@ -1,35 +1,116 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { FormProvider, useFieldArray, useForm, useFormContext, } from 'react-hook-form';
+import styles from './App.module.css'
+import { Popover } from 'react-tiny-popover';
+import { HexColorPicker } from 'react-colorful';
+import { Fragment, useState } from 'react';
+
+type Friend = {
+  name?: string;
+  email?: string;
+  age?: number;
+
+  favoriteColor: string;
+}
+
+type FormData = {
+  name: string;
+  email: string;
+  skills: { label: string }[];
+
+  friends: Friend[];
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const form = useForm<FormData>({
+    defaultValues: {
+      name: '',
+      email: '',
+      skills: [],
+      friends: []
+    }
+  });
+
+  return (
+    <main className={styles.main}>
+      <FormProvider {...form}>
+        <form>
+          <label>
+            Name: <input type="text" {...form.register('name')} />
+          </label>
+          <label>
+            Email: <input type="text" {...form.register('email')} />
+          </label>
+          <Skills />
+          <Friends />
+
+        </form>
+      </FormProvider>
+
+      <textarea disabled value={JSON.stringify(form.getValues(), null, 2)} />
+    </main>
+  )
+}
+
+function Skills() {
+  const form = useFormContext<FormData>();
+  const skills = useFieldArray<FormData>({ name: 'skills' });
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      <button type="button" onClick={() => skills.append({ label: "" })}>Add Skill</button>
+
+      {skills.fields.map((skill, index) =>
+        <label key={skill.id}>
+          Skill: <input type="text" {...form.register(`skills.${index}.label`)} />
+          <button type="button" onClick={() => skills.remove(index)}>Remove</button>
+        </label>
+      )}
+    </>)
+
+}
+
+function Friends() {
+  const form = useFormContext<FormData>();
+  const friends = useFieldArray<FormData, 'friends'>({ name: 'friends' });
+
+  form.watch()
+
+  return (
+    <>
+      <button type="button" onClick={() => friends.append({ favoriteColor: "#0000FF" })}>Add Friend</button>
+
+      {friends.fields.map((friend, index) =>
+        <Fragment key={friend.id}>
+          <Friend key={friend.id} friend={friend} index={index} remove={() => friends.remove(index)} />
+        </Fragment>
+      )}
+    </>)
+}
+
+function Friend({ friend, index, remove }: { friend: Friend, index: number, remove: () => void }) {
+  const form = useFormContext<FormData>();
+  const [open, setOpen] = useState(false);
+
+  return <div>
+    <div>
+      <label>
+        Name: <input type="text" {...form.register(`friends.${index}.name`)} />
+      </label>
+      <label>
+        Email: <input type="text" {...form.register(`friends.${index}.email`)} />
+      </label>
+      <label>
+        Favorite Color: <Popover
+          isOpen={open}
+          content={<HexColorPicker color={friend.favoriteColor} onChange={color => form.setValue(`friends.${index}.favoriteColor`, color)} />}
+          onClickOutside={() => setOpen(false)}
+        >
+          <div style={{ backgroundColor: form.watch(`friends.${index}.favoriteColor`), width: 20, height: 20 }} onClick={() => setOpen(true)} />
+        </Popover>
+      </label>
+    </div>
+    <button type="button" onClick={remove}>Remove</button>
+  </div>
 }
 
 export default App
