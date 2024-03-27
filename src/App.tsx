@@ -29,7 +29,7 @@ function App() {
     defaultValues: {
       name: '',
       email: '',
-      // likesTypescript: '',
+      likesTypescript: 'YES',
       skills: [],
       friends: []
     }
