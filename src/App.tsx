@@ -9,7 +9,10 @@ type Friend = {
   email?: string;
   age?: number;
 
-  favoriteColor: string;
+  favorites: {
+    color?: string;
+    number?: number;
+  }
 }
 
 type FormData = {
@@ -77,7 +80,7 @@ function Friends() {
 
   return (
     <>
-      <button type="button" onClick={() => friends.append({ favoriteColor: "#0000FF" })}>Add Friend</button>
+      <button type="button" onClick={() => friends.append({ favorites: { color: "#0000ff" } })}>Add Friend</button>
 
       {friends.fields.map((friend, index) =>
         <Fragment key={friend.id}>
@@ -100,13 +103,16 @@ function Friend({ friend, index, remove }: { friend: Friend, index: number, remo
         Email: <input type="text" {...form.register(`friends.${index}.email`)} />
       </label>
       <label>
-        Favorite Color: <Popover
+        Favorite color: <Popover
           isOpen={open}
-          content={<HexColorPicker color={friend.favoriteColor} onChange={color => form.setValue(`friends.${index}.favoriteColor`, color)} />}
+          content={<HexColorPicker color={friend.favorites.color} onChange={color => form.setValue(`friends.${index}.favorites.color`, color)} />}
           onClickOutside={() => setOpen(false)}
         >
-          <div style={{ backgroundColor: form.watch(`friends.${index}.favoriteColor`), width: 20, height: 20 }} onClick={() => setOpen(true)} />
+          <div style={{ backgroundColor: form.watch(`friends.${index}.favorites.color`), width: 20, height: 20 }} onClick={() => setOpen(true)} />
         </Popover>
+      </label>
+      <label>
+        Number: <input type="number" {...form.register(`friends.${index}.favorites.number`, { valueAsNumber: true })} />
       </label>
     </div>
     <button type="button" onClick={remove}>Remove</button>
