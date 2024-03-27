@@ -19,6 +19,7 @@ type FormData = {
   name: string;
   email: string;
   skills: { label: string }[];
+  likesTypescript: 'YES' | 'NO' | 'YES_AGAIN';
 
   friends: Friend[];
 }
@@ -28,6 +29,7 @@ function App() {
     defaultValues: {
       name: '',
       email: '',
+      // likesTypescript: '',
       skills: [],
       friends: []
     }
@@ -43,6 +45,18 @@ function App() {
           <label>
             Email: <input type="text" {...form.register('email')} />
           </label>
+          <fieldset>
+            Do you like Typescript?
+            <label>
+              <input type="radio" value="YES" {...form.register('likesTypescript')} /> Yes
+            </label>
+            <label>
+              <input type="radio" value="NO" {...form.register('likesTypescript')} /> No
+            </label>
+            <label>
+              <input type="radio" value="YES_AGAIN" {...form.register('likesTypescript')} /> Yes Again
+            </label>
+          </fieldset>
           <Skills />
           <Friends />
 
@@ -110,6 +124,10 @@ function Friend({ friend, index, remove }: { friend: Friend, index: number, remo
         >
           <div style={{ backgroundColor: form.watch(`friends.${index}.favorites.color`), width: 20, height: 20 }} onClick={() => setOpen(true)} />
         </Popover>
+      </label>
+      <label>
+        Native favorite color
+        <input type="color" {...form.register(`friends.${index}.favorites.color`)} />
       </label>
       <label>
         Number: <input type="number" {...form.register(`friends.${index}.favorites.number`, { valueAsNumber: true })} />
