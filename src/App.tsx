@@ -7,7 +7,7 @@ import { Fragment, useState } from 'react';
 type Friend = {
   name?: string;
   email?: string;
-  age?: number;
+  birthday?: string;
 
   favorites: {
     color?: string;
@@ -132,6 +132,12 @@ function Friend({ friend, index, remove }: { friend: Friend, index: number, remo
       <label>
         Number: <input type="number" {...form.register(`friends.${index}.favorites.number`, { valueAsNumber: true })} />
       </label>
+      <label>
+        Birthday: <input type="date" {...form.register(`friends.${index}.birthday`)} />
+      </label>
+      {/* <label>
+        Birthday: <input type="datetime-local" {...form.register(`friends.${index}.birthday`)} />
+      </label> */}
     </div>
     <button type="button" onClick={remove}>Remove</button>
   </div>
